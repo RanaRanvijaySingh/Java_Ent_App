@@ -1,14 +1,21 @@
 package com.webonise.sevletdemo.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+//import java.sql.Connection;
+//import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import com.mysql.jdbc.ResultSet;
-import com.mysql.jdbc.Statement;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.AnnotationConfiguration;
+//import org.hibernate.cfg.AnnotationConfiguration;
+
 import com.webonise.serveletdemo.model.Department;
-import com.mysql.*;
+//import com.mysql.*;
 
 /**
  * @author webonise
@@ -16,51 +23,64 @@ import com.mysql.*;
  */
 public class DepartmentImp implements DepartmentDoa
 {
-	
-
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	 
-	private static final String url = "jdbc:mysql://localhost:3306/test";
- 
-    private static final String user = "root";
- 
-    private static final String password = "root";
     
     ArrayList<Department> departmentList;
     
-	/* (non-Javadoc)
-	 * @see com.webonise.sevletdemo.dao.EmployeeDoaInterface#addEmployeeRow(com.webonise.serveletdemo.model.Employee)
+    private static SessionFactory factory; 
+	/* 	(non-Javadoc)
+	 * 	@see com.webonise.sevletdemo.dao.EmployeeDoaInterface#addEmployeeRow(com.webonise.serveletdemo.model.Employee)
 	 *	function to add a row in the database of the table employee
 	 */
 	@Override
 	public void addDepartmentRow(Department department) throws SQLException 
-	{
-		try {
-			Class.forName (JDBC_DRIVER);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	{ 
+
+  	  System.out.println("in the addDepartmentRow");
 		
-		System.out.println("establishing connection");
-		
-		Connection con = DriverManager.getConnection(url, user, password);   
-    	
-		Statement stat_EMP = (Statement) con.createStatement();
-		
-		System.out.println("connection made");
-		
-		String sql = "insert into employee values" +
-				"(NULL,'" +
-				department.getName()+"')";
-		
-   	 	stat_EMP.executeUpdate(sql);
-   	 System.out.println("value inserted");
-		
+		      try
+		      {
+		    	 AnnotationConfiguration anno= new AnnotationConfiguration().addResource("hibernate.cfg.xml").configure() .addAnnotatedClass(com.webonise.serveletdemo.model.Department.class);
+		         System.out.println("creting factory ");
+		    	 factory = anno.buildSessionFactory();
+		         
+		      }catch (Throwable ex) { 
+		         System.out.println("Failed to create sessionFactory object." + ex);
+		         throw new ExceptionInInitializerError(ex); 
+		      }
+		     
+		     
+		      Session session = factory.openSession();
+		      Transaction tx = null;
+
+	    	  System.out.println("initilizing transaction");
+		      try
+		      {
+		         tx = session.beginTransaction();
+
+		    	 System.out.println("adding to depertment");
+		       //  Employee employee1 = new Employee("rana",11,23,"1989-11-5",4);
+		       
+
+		    	 System.out.println("saving to department");
+		         session.save(department); 
+
+		    	  System.out.println("saved in department");
+		         tx.commit();
+		      }
+		      catch (HibernateException e) 
+		      {
+		         if (tx!=null) tx.rollback();
+		         e.printStackTrace(); 
+		      }
+		      finally 
+		      {
+		         session.close(); 
+		      }
 	}
 	
+	
 	/* (non-Javadoc)
-	 * @see com.webonise.sevletdemo.dao.DepartmentDoaInterface#fetchDaoEmployeeData()
+	 * @see com.webonise.sevletdemo.dao.EmployeeDoaInterface#fetchDaoEmployeeData()
 	 *	function to fetch the data from the database back to the service class
 	 */
 	@Override
@@ -68,45 +88,41 @@ public class DepartmentImp implements DepartmentDoa
 	{
 		departmentList= new ArrayList<Department>();
 		
-		try {
-			Class.forName (JDBC_DRIVER);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Connection con = DriverManager.getConnection(url, user, password);   
-		System.out.println("EMPLOYEE: dao : fetching data");
-		
-		Statement stat_emp = (Statement) con.createStatement();
-		String query_emp="SELECT * FROM department";
-		System.out.println("Department: dao : fetching data");
-		
-		ResultSet rs_emp=(ResultSet) stat_emp.executeQuery(query_emp);
-		
-		System.out.println("---------------------------------------------------");
-        System.out.println("ID\tDEPATRMENT");
-        System.out.println("---------------------------------------------------");
-        int i=0;
-        while(rs_emp.next())
-        {
-        	
-        	Department department = new Department();
-           //Retrieve by column name
-           int id  = rs_emp.getInt("id");
-           String name= rs_emp.getString("dept_name");
-         
-           
-           department.setName(name);
-           department.setId(id);
-           
-           //Display values
-           System.out.println( department.getId()+"\t"+ department.getName());
+		Session session = factory.openSession();
+	      Transaction tx = null;
+	      System.out.println("reached to the display");
+	      try
+	      {
+	         tx = session.beginTransaction();
+	         System.out.println("begin transaction ");
+		   
+	        
+	         List departments = session.createQuery(" FROM Department ").list(); 
+
+	         System.out.println("--------------------------------");
+	         System.out.println("ID\tNAME");
+	         System.out.println("--------------------------------");
+		      
+	         for (Iterator iterator = departments.iterator(); iterator.hasNext();)
+	         {
+	        	 Department department = (Department) iterator.next(); 
+	            System.out.println(department.getId()+"\t"+
+	            		department.getName()); 
+	            
+	            departmentList.add(department);
+	         }
+	         tx.commit();
+	      }catch (HibernateException e) {
+	         if (tx!=null) tx.rollback();
+	         e.printStackTrace(); 
+	      }finally {
+	         session.close(); 
+	      } 
+	      //employeeList.add(employee);
           
-           departmentList.add( department);
-          
-        }
-		return  departmentList;	
+        
+		
+	return departmentList;	
 		
 	}
 	

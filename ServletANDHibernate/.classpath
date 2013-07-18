@@ -32,5 +32,6 @@
 	<classpathentry kind="lib" path="/home/webonise/Downloads/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="/home/webonise/Downloads/jstl.jar"/>
 	<classpathentry kind="lib" path="/home/webonise/Downloads/jta-1.1.jar"/>
+	<classpathentry kind="lib" path="/home/webonise/Downloads/antlr-2.7.6.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

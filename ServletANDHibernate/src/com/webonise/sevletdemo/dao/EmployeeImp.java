@@ -91,21 +91,28 @@ public class EmployeeImp implements EmployeeDoa
 		Session session = factory.openSession();
 	      Transaction tx = null;
 	      System.out.println("reached to the display");
-	      try{
+	      try
+	      {
 	         tx = session.beginTransaction();
 	         System.out.println("begin transaction ");
-		      
+		   
+	         String query="select id,fname,age,dob,dept_id from employee";
 	         List employees = session.createQuery("FROM Employee").list(); 
-	         System.out.println("query created");
+
+	         System.out.println("----------------------------------------------------------------");
+	         System.out.println("ID\tNAME\tDOB\tAGE\tDEPARTMENT");
+	         System.out.println("----------------------------------------------------------------");
 		      
 	         for (Iterator iterator = employees.iterator(); iterator.hasNext();)
 	         {
 	            Employee employee = (Employee) iterator.next(); 
-	            System.out.print("Id: " + employee.getId()); 
-	            System.out.print("Name: " + employee.getName()); 
-	            System.out.print("DOB: " + employee.getDob()); 
-	            System.out.print("Age: " + employee.getAge()); 
-	            System.out.println("Department: " + employee.getDeptId()); 
+	            System.out.println(employee.getId()+"\t"+
+	            		employee.getName()+"\t"+
+	            		employee.getDob()+"\t"+
+	            		employee.getAge()+"\t"+
+	            		employee.getDeptId()); 
+	            
+	            employeeList.add(employee);
 	         }
 	         tx.commit();
 	      }catch (HibernateException e) {

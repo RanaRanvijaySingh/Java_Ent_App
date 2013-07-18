@@ -1,6 +1,13 @@
 package com.webonise.serveletdemo.model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -9,10 +16,30 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * the main employee class 
  *
  */
+@Entity
+@Table(name = "department")
 public class Department implements Serializable
 {
-	private String name ;
+	@Id @GeneratedValue
+	   @Column(name = "id")
 	private int id;
+	@Column(name = "dept_name")
+	private String name ;
+	
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	
 	
 	/**
@@ -38,33 +65,7 @@ public class Department implements Serializable
 	/**
 	 * @return to return the id
 	 */
-	public int getId()
-	{
-		return id;
-	}
-	/**
-	 * @return to return the name
-	 */
-	public String getName()
-	{
-		return name;
-	}
 	
-	/**
-	 * @param name .. sets the name of the employee
-	 */
-	public void setName(String name )
-	{
-		this.name=name;
-	}
-	/**
-	 * @param name .. sets the age of the employee
-	 */
-	
-	public void setId(int id)
-	{
-		this.id=id;
-	}
 	@Override
 	public int hashCode() {
         return new HashCodeBuilder(1583,2179).append(name)
